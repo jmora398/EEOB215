@@ -1,0 +1,59 @@
+---
+title: "0. Importing the data"
+author: "Jorge Mora (JM) and Bianca Campoagnari (BC)"
+date: "2026-11-06"
+output: html_document
+---
+Setting the working directory for the metabarcode and loading libraries and/or packages
+```{r, message = FALSE, warning = TRUE}
+setwd("/Users/jorgemora/Documents/JorgeMora/PhD/Classes/Fall_2026/EEOB_215/FinalProject_EEOB215/Exported_Data") #Working directory for JM
+dir.exists("/Volumes/Elements/Osmia_Project_2025/Exported_Data")
+getwd()
+library(tidyverse)
+```
+
+Importing the data for the metabarcodes.
+
+FILTER_TAXA <- list(
+  bacteria = "Chloroplast|Mitochondria|Unassigned",
+  fungi    = NULL,
+  plants   = NULL
+)
+
+```{r, message=FALSE, warning=TRUE}
+setwd("/Users/jorgemora/Documents/JorgeMora/PhD/Classes/Fall_2026/EEOB_215/FinalProject_EEOB215/Exported_Data") #Working directory for JM
+
+# Metadata
+sample_metadata <- read_tsv("sample-metadata.tsv") |> 
+  rename("SampleID" = 1)
+
+
+# For plants
+plants_filtered <- read_tsv("plants_filtered_table.tsv", skip = 1) |>
+  rename("OTU_ID" = 1) |> 
+  select(!matches("^BLANK|^EMPTY"))
+
+plants_taxonomy <- read_tsv("plants_taxonomy.tsv") |> 
+  rename("OTU_ID" = 1)
+
+as.data.frame("plants_filtered & plants_taxonomy")
+?left_join
+plants <- plants_filtered |> 
+  left_join(plants_taxonomy, by = "OTU_ID") |> 
+  as.data.frame()
+
+# For bacteria (16s)
+bacteria_filtered <- read_tsv("16s_filtered_table.tsv", skip = 1) |>
+  rename("OTU_ID" = 1) |> 
+  select(!matches("^BLANK|^EMPTY"))
+
+bacteria_taxonomy <- read_tsv("16s_taxonomy.tsv") |> 
+  rename("OTU_ID" = 1)
+
+as.data.frame("bacteria_filtered & bacteria_taxonomy")
+?left_join
+bacteria <- bacteria_filtered |> 
+  left_join(bacteria_taxonomy, by = "OTU_ID") |> 
+  as.data.frame()
+
+```
